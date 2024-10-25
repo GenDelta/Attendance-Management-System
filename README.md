@@ -1,7 +1,5 @@
 ## Attendance Management System in CPP
 
-**Student Attendance Management System**
-
 This project implements a student attendance management system using object-oriented programming concepts like inheritance, polymorphism and virtual functions in C++. It allows teachers to mark attendance, students to view their attendance records, and persists data to a CSV file.
 
 **Contributors**
