@@ -1,3 +1,2 @@
-Name,PRN,DMGT_TotalHours,DMGT_Attended,DMGT_Percentage,PP_TotalHours,PP_Attended,PP_Percentage
-Ankush Dutta,32,60,1,1.67,45,0,0.00
-Aayush Joshi,8,60,0,0.00,45,1,2.22
+Name,PRN,fgh_TotalHours,fgh_Attended,fgh_Conducted,fgh_Current%,fgh_Overall%,od_TotalHours,od_Attended,od_Conducted,od_Current%,od_Overall%
+dh,45,15,0,1,0.00,0.00,45,0,0,0.00,0.00
