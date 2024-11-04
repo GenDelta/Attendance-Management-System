@@ -1,14 +1,13 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <iomanip>  // for formatting
-#include <limits>   // for numeric_limits
+#include <iomanip>  
+#include <limits>   
 using namespace std;
 
 const int MAX_STUDENTS = 100;
 const int MAX_COURSES = 10;
 
-// Function to split a string
 void splitString(const string &str, char delimiter, string tokens[], int &tokenCount) {
     string token;
     stringstream ss(str);
@@ -18,7 +17,6 @@ void splitString(const string &str, char delimiter, string tokens[], int &tokenC
     }
 }
 
-// Base class for Person
 class Person {
 protected:
     string name;
@@ -29,48 +27,44 @@ public:
     virtual void display() {
         cout << "Name: " << name << ", PRN: " << prn << endl;
     }
-    string getName() const { return name; } // Getter for name
-    int getPrn() const { return prn; } // Getter for prn
+    string getName() const { return name; } 
+    int getPrn() const { return prn; } 
 };
 
-// Course class
 class Course {
 public:
     string courseName;
     int totalHours;
     int attendedHours;
 
-    Course() : courseName(""), totalHours(0), attendedHours(0) {} // Default constructor
+    Course() : courseName(""), totalHours(0), attendedHours(0) {} 
 
     Course(string name, int hours) : courseName(name), totalHours(hours), attendedHours(0) {}
 
-    double getAttendancePercentage() const { // Marked as const
+    double getAttendancePercentage() const { 
         if (totalHours == 0) return 0;
         return (attendedHours / (double)totalHours) * 100;
     }
 
-    void display() const { // Marked as const
+    void display() const { 
         cout << "Course Name: " << courseName << ", Total Hours: " << totalHours << ", Attended Hours: " << attendedHours << endl;
     }
 };
 
-// Derived class for Student, inheriting from Person
 class Student : public Person {
 public:
-    Course courses[MAX_COURSES];  // Courses the student is enrolled in
+    Course courses[MAX_COURSES];  
     int courseCount;
 
     Student() : Person(), courseCount(0) {}
     Student(string n, int p) : Person(n, p), courseCount(0) {}
 
-    // Adding a course for the student
     void addCourse(Course course) {
         if (courseCount < MAX_COURSES) {
             courses[courseCount++] = course;
         }
     }
 
-    // Overriding markAttendance (example of polymorphism)
     virtual void markAttendance(string courseName, bool present) {
         for (int i = 0; i < courseCount; ++i) {
             if (courses[i].courseName == courseName) {
@@ -88,8 +82,7 @@ public:
         cout << "Course not found." << endl;
     }
 
-    // Viewing attendance in formatted form
-    void viewAttendance() const { // Marked as const
+    void viewAttendance() const { 
         cout << setw(15) << left << "Course Name" << setw(15) << "Attended" << setw(15) << "Total" << setw(10) << "Percentage" << endl;
         cout << "-------------------------------------------------------------" << endl;
         for (int i = 0; i < courseCount; ++i) {
@@ -101,17 +94,14 @@ public:
     }
 };
 
-// Derived class for Teacher, inheriting from Person
 class Teacher : public Person {
 public:
     Teacher(string n, int p) : Person(n, p) {}
 
-    // Overriding display function for teachers
     void display() override {
         cout << "Teacher: " << name << ", PRN: " << prn << endl;
     }
 
-    // Display attendance for all students in each course
     void displayAttendanceForAll(const Student students[], int studentCount, const string courseNames[], int courseCount) const {
         for (int i = 0; i < courseCount; ++i) {
             cout << "\nAttendance for course: " << courseNames[i] << endl;
@@ -133,18 +123,15 @@ public:
     }
 };
 
-// Helper function to write data to CSV file
 void writeCSV(const Student students[], int studentCount, const string courseNames[], int courseCount, const string &filename) {
     ofstream file(filename);
     if (file.is_open()) {
-        // Write headers
         file << "Name,PRN";
         for (int i = 0; i < courseCount; ++i) {
             file << "," << courseNames[i] << "_TotalHours," << courseNames[i] << "_Attended," << courseNames[i] << "_Percentage";
         }
         file << endl;
 
-        // Write student data
         for (int i = 0; i < studentCount; ++i) {
             file << students[i].getName() << "," << students[i].getPrn();
             for (int j = 0; j < courseCount; ++j) {
@@ -159,7 +146,7 @@ void writeCSV(const Student students[], int studentCount, const string courseNam
                     }
                 }
                 if (!courseFound) {
-                    file << ",0,0,0.00"; // Default values if course not found
+                    file << ",0,0,0.00"; 
                 }
             }
             file << endl;
@@ -171,7 +158,6 @@ void writeCSV(const Student students[], int studentCount, const string courseNam
     }
 }
 
-// Helper function to read data from CSV file
 void readCSV(Student students[], int &studentCount, string courseNames[], int &courseCount, const string &filename) {
     ifstream file(filename);
     if (file.is_open()) {
@@ -180,7 +166,6 @@ void readCSV(Student students[], int &studentCount, string courseNames[], int &c
         studentCount = 0;
         while (getline(file, line)) {
             if (firstLine) {
-                // Read course names from the first line (header)
                 string headers[MAX_COURSES * 3];
                 int headerCount;
                 splitString(line, ',', headers, headerCount);
@@ -190,7 +175,6 @@ void readCSV(Student students[], int &studentCount, string courseNames[], int &c
                 }
                 firstLine = false;
             } else {
-                // Read student data
                 string tokens[MAX_COURSES * 3 + 2];
                 int tokenCount;
                 splitString(line, ',', tokens, tokenCount);
@@ -198,7 +182,6 @@ void readCSV(Student students[], int &studentCount, string courseNames[], int &c
                 int prn = stoi(tokens[1]);
                 Student student(studentName, prn);
 
-                // Add courses with total and attended hours
                 for (int i = 2, j = 0; i < tokenCount; i += 3, ++j) {
                     int totalHours = stoi(tokens[i]);
                     int attendedHours = stoi(tokens[i + 1]);
@@ -216,13 +199,11 @@ void readCSV(Student students[], int &studentCount, string courseNames[], int &c
     }
 }
 
-// Function for teacher to mark attendance
 void markAttendance(Student students[], int studentCount, const string courseNames[], int courseCount) {
     cout << "Enter course name: ";
     string courseName;
     cin >> courseName;
 
-    // Check if the course name is valid
     bool courseExists = false;
     for (int i = 0; i < courseCount; ++i) {
         if (courseNames[i] == courseName) {
@@ -240,28 +221,27 @@ void markAttendance(Student students[], int studentCount, const string courseNam
     for (int i = 0; i < studentCount; ++i) {
         char response;
         cout << "Is " << students[i].getName() << " present for " << courseName << "? (Enter 'P' for present, 'A' for absent): ";
-        while (!(cin >> response) || (response != 'P' && response != 'A')) { // Ensure valid input
-            cin.clear(); // Clear the error flag
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Ignore invalid input
+        while (!(cin >> response) || (response != 'P' && response != 'A')) { 
+            cin.clear(); 
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
             cout << "Invalid input. Please enter 'P' for present or 'A' for absent: ";
         }
         students[i].markAttendance(courseName, response == 'P');
     }
 }
 
-// Student portal for viewing attendance
 void studentPortal(const Student students[], int studentCount) {
     cout << "Enter student PRN: ";
     int prn;
-    while (!(cin >> prn)) { // Ensure valid input
-        cin.clear(); // Clear the error flag
-        cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Ignore invalid input
+    while (!(cin >> prn)) { 
+        cin.clear(); 
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
         cout << "Invalid input. Please enter a valid PRN: ";
     }
 
     for (int i = 0; i < studentCount; ++i) {
-        if (students[i].getPrn() == prn) { // Use getter method
-            students[i].viewAttendance(); // Call const method
+        if (students[i].getPrn() == prn) { 
+            students[i].viewAttendance(); 
             return;
         }
     }
@@ -275,29 +255,27 @@ int main() {
     int courseCount = 0;
     string filename = "Attendance_File.csv";
 
-    // Load previous data from CSV
     readCSV(students, studentCount, courseNames, courseCount, filename);
 
-    // If no previous data, setup students and courses
     if (studentCount == 0) {
         cout << "Enter number of students: ";
         int numStudents;
-        while (!(cin >> numStudents) || numStudents > MAX_STUDENTS) { // Ensure valid input
-            cin.clear(); // Clear the error flag
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Ignore invalid input
+        while (!(cin >> numStudents) || numStudents > MAX_STUDENTS) { 
+            cin.clear(); 
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
             cout << "Invalid input. Please enter a valid number of students (max " << MAX_STUDENTS << "): ";
         }
 
         for (int i = 0; i < numStudents; ++i) {
             string name;
             int prn;
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear the buffer
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
             cout << "Enter name of student " << (i + 1) << ": ";
             getline(cin, name);
             cout << "Enter PRN of student " << (i + 1) << ": ";
-            while (!(cin >> prn)) { // Ensure valid input
-                cin.clear(); // Clear the error flag
-                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Ignore invalid input
+            while (!(cin >> prn)) {
+                cin.clear(); 
+                cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
                 cout << "Invalid input. Please enter a valid PRN: ";
             }
             students[studentCount++] = Student(name, prn);
@@ -305,21 +283,21 @@ int main() {
 
         cout << "Enter number of courses: ";
         int numCourses;
-        while (!(cin >> numCourses) || numCourses > MAX_COURSES) { // Ensure valid input
-            cin.clear(); // Clear the error flag
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Ignore invalid input
+        while (!(cin >> numCourses) || numCourses > MAX_COURSES) { 
+            cin.clear(); 
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
             cout << "Invalid input. Please enter a valid number of courses (max " << MAX_COURSES << "): ";
         }
 
         for (int i = 0; i < numCourses; ++i) {
             string courseName;
             int credits;
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear the buffer
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
             cout << "Enter course name and credits for course " << (i + 1) << ": ";
             getline(cin, courseName);
-            while (!(cin >> credits)) { // Ensure valid input
-                cin.clear(); // Clear the error flag
-                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Ignore invalid input
+            while (!(cin >> credits)) { 
+                cin.clear(); 
+                cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
                 cout << "Invalid input. Please enter valid credits: ";
             }
             courseNames[courseCount++] = courseName;
@@ -328,7 +306,6 @@ int main() {
             }
         }
 
-        // Save initial data to CSV
         writeCSV(students, studentCount, courseNames, courseCount, filename);
     }
 
@@ -339,7 +316,7 @@ int main() {
 
         if (choice == 1) {
             markAttendance(students, studentCount, courseNames, courseCount);
-            writeCSV(students, studentCount, courseNames, courseCount, filename); // Save data after marking attendance
+            writeCSV(students, studentCount, courseNames, courseCount, filename);
         } else if (choice == 2) {
             studentPortal(students, studentCount);
         } else if (choice == 3) {
